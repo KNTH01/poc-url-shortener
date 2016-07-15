@@ -3,16 +3,15 @@ body {
 }
 
 .Page {
-  border-radius: 5px;
   padding: 30px;
   margin-top: 200px;
-  text-align: center;
+  border-radius: 5px;
   background: rgba(250, 250, 250, 0.8);
+  text-align: center;
 }
 
 .FormInput-input {
   padding: 15px !important;
-  margin-bottom: 50px;
   height: auto !important;
   font-size: 3rem;
 }
@@ -24,7 +23,7 @@ body {
 
 .Result {
   margin-top: 50px;
-  font-size: 2.5rem;
+  font-size: 4rem;
 }
 
 .ErrorMsg {

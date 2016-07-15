@@ -1,16 +1,14 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
+
+const redis = require('redis')
+const redisClient = redis.createClient() // Creates a new client
 
 const config = require('./config')
 const Base58 = require('./lib/Base58')
-const Url = require('./models/Url')
 
 const app = express()
-
-// Connect to mongodb
-mongoose.connect('mongodb://' + config.db.host + '/' + config.db.name)
 
 // Config bodyParser
 app.use(bodyParser.json())
@@ -28,40 +26,51 @@ app.get('/', (req, res) => {
 
 // Handle the shorten action
 app.post('/api/shorten', (req, res) => {
+  const COUNT_URL = 'countUrl'
   let longUrl = req.body.url
   let shortUrl = ''
 
-  // Check if url already exists in database
-  Url.findOne({
-    long_url: longUrl
-  }, (err, doc) => {
+  // Request the hash by longUrl key
+  redisClient.get(longUrl, (err, reply) => {
     if (err) {
-      res.status(500).send('Error: something wrong happens when requesting for the URL')
+      res.status(500).send('Error: unable to request the submitted URL')
       return
     }
-    if (doc) {
-      // Build the short url by encoding with Base58 the id
-      shortUrl = config.webhost + Base58.encode(doc._id)
-
+    // If the url is already submitted
+    if (reply) {
+      // Shorten the Url with the url id and send it back to the client
+      shortUrl = config.webhost + Base58.encode(reply)
       res.send({
-        'shortUrl': shortUrl
+        shortUrl
       })
     } else {
-      let newUrl = Url({
-        long_url: longUrl
-      })
-
-      // Create a new entry in our URL collection
-      newUrl.save((err) => {
+      // Store a new url
+      // Begin by incrementing the count key and will use it as the url id
+      redisClient.incr(COUNT_URL, (err, replyCount) => {
         if (err) {
-          res.status(500).send('Error: unable to save the new URL')
+          res.status(500).send('Error: something wrong happens when saving a new URL id in the database')
           return
         }
-        // Build the short url by encoding with Base58 the id
-        shortUrl = config.webhost + Base58.encode(newUrl._id)
+        // Store the hash by the new longUrl key
+        redisClient.set(longUrl, replyCount, (err) => {
+          if (err) {
+            res.status(500).send('Error: something wrong happens when saving a new URL in the database')
+            return
+          }
 
-        res.send({
-          'shortUrl': shortUrl
+          let encodedKey = Base58.encode(replyCount)
+          shortUrl = config.webhost + encodedKey
+
+          redisClient.set(encodedKey, longUrl, (err) => {
+            if (err) {
+              res.status(500).send('Error: something wrong happens when saving the new encoded key in the database')
+              return
+            }
+
+            res.send({
+              shortUrl
+            })
+          })
         })
       })
     }
@@ -70,19 +79,16 @@ app.post('/api/shorten', (req, res) => {
 
 app.get('/:encoded_id', (req, res) => {
   let base58Id = req.params.encoded_id
-  let id = Base58.decode(base58Id)
 
-  // Check if the url already exists in database
-  Url.findOne({
-    _id: id
-  }, (err, doc) => {
+  redisClient.get(base58Id, (err, reply) => {
     if (err) {
       res.status(500).send('Error: unable to fetch the requested URL')
       return
     }
-    if (doc) {
+
+    if (reply) {
       // There is match with the short url in our URL collection
-      res.redirect(doc.long_url)
+      res.redirect(reply)
     } else {
       // Not found, redirect to the homepage
       res.redirect(config.webhost)
@@ -90,6 +96,9 @@ app.get('/:encoded_id', (req, res) => {
   })
 })
 
-app.listen(3000, () => {
-  console.log('Server listening on port 3000')
+// Wait for connection to Redis server before launching the server
+redisClient.on('connect', () => {
+  app.listen(3000, () => {
+    console.log('Server listening on port 3000')
+  })
 })

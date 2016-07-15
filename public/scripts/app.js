@@ -1,6 +1,5 @@
 // add an event listener to the shorten button for when the user clicks it
 $('.FormInput-button').on('click', () => {
-  console.log('Shorten !')
     // AJAX call to /api/shorten with the URL that the user entered in the input box
   $.ajax({
     url: '/api/shorten',
