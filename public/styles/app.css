@@ -1,0 +1,32 @@
+body {
+  background: url('../images/bg.png') repeat;
+}
+
+.Page {
+  border-radius: 5px;
+  padding: 30px;
+  margin-top: 200px;
+  text-align: center;
+  background: rgba(250, 250, 250, 0.8);
+}
+
+.FormInput-input {
+  padding: 15px !important;
+  margin-bottom: 50px;
+  height: auto !important;
+  font-size: 3rem;
+}
+
+.FormInput-button {
+  font-size: 3rem;
+  height: 6rem;
+}
+
+.Result {
+  margin-top: 50px;
+  font-size: 2.5rem;
+}
+
+.ErrorMsg {
+  color: #AA3939;
+}
