@@ -1,24 +1,68 @@
-// add an event listener to the shorten button for when the user clicks it
-$('.FormInput-button').on('click', () => {
-    // AJAX call to /api/shorten with the URL that the user entered in the input box
+/**
+ * Show error message
+ * @param  {[type]} msg [description]
+ * @return {[type]}     [description]
+ */
+function showMessage (msg) {
+  let resultHTML = `<p class="ErrorMsg">${msg}</p>`
+  $('.Result').html(resultHTML)
+  $('.Result').hide().fadeIn('slow')
+}
+
+/**
+ * Show the generated short url
+ * @param  {[type]} shortUrl [description]
+ * @return {[type]}          [description]
+ */
+function showShortenUrl (shortUrl) {
+  let resultHTML = '<a class="result" href="' + shortUrl + '">' + shortUrl + '</a>'
+  $('.Result').html(resultHTML)
+  $('.Result').hide().fadeIn('slow')
+}
+
+/**
+ * Clear the user input after submission
+ * @return {[type]} [description]
+ */
+function clearInput () {
+  $('.FormInput-input').val('')
+}
+
+/**
+ * AJAX request
+ * @return {[type]} [description]
+ */
+function shortenUrlRequest () {
+  let userUrlInput = $.trim($('.FormInput-input').val())
+
+  if (userUrlInput.length === 0) {
+    showMessage('The input URL is not valid')
+    clearInput()
+    return
+  }
+
   $.ajax({
     url: '/api/shorten',
     type: 'POST',
     dataType: 'JSON',
     data: {
-      url: $('.FormInput-input').val()
+      url: userUrlInput
     },
     success: (data) => {
-      // display the shortened URL to the user that is returned by the server
-      let resultHTML = '<a class="result" href="' + data.shortUrl + '">' + data.shortUrl + '</a>'
-      $('.Result').html(resultHTML)
-      $('.Result').hide().fadeIn('slow')
+      showShortenUrl(data.shortUrl)
+      clearInput()
     },
     error: (data) => {
-      let resultHTML = `<p class="ErrorMsg">${data.responseText}</p>`
-      console.log(data)
-      $('.Result').html(resultHTML)
-      $('.Result').hide().fadeIn('slow')
+      showMessage(data.responseText)
+      clearInput()
     }
   })
+}
+
+// Add event listeners
+$('.FormInput-button').on('click', shortenUrlRequest)
+$('.FormInput-input').bind('keypress', (e) => {
+  if (e.keyCode === 13) {
+    shortenUrlRequest()
+  }
 })
