@@ -5,13 +5,13 @@ const router = express.Router()
 const config = require('./config')
 const Base58 = require('./lib/Base58')
 
-// Handle the shorten action
+// Shorten the url
 router.post('/api/shorten', (req, res) => {
   const COUNT_URL = 'countUrl'
   let longUrl = req.body.url
   let shortUrl = ''
 
-  // Request the hash by longUrl key
+  // Fetch the long url
   redisClient.get(longUrl, (err, reply) => {
     if (err) {
       res.status(500).send('Error: unable to request the submitted URL')
@@ -32,7 +32,7 @@ router.post('/api/shorten', (req, res) => {
           res.status(500).send('Error: something wrong happens when saving a new URL id in the database')
           return
         }
-        // Store the hash by the new longUrl key
+        // Store the new url with key => url, value => id
         redisClient.set(longUrl, replyCount, (err) => {
           if (err) {
             res.status(500).send('Error: something wrong happens when saving a new URL in the database')
@@ -42,6 +42,7 @@ router.post('/api/shorten', (req, res) => {
           let encodedKey = Base58.encode(replyCount)
           shortUrl = config.webhost + encodedKey
 
+          // store the encoded key in order to fetch the long url when requested
           redisClient.set(encodedKey, longUrl, (err) => {
             if (err) {
               res.status(500).send('Error: something wrong happens when saving the new encoded key in the database')
@@ -61,6 +62,7 @@ router.post('/api/shorten', (req, res) => {
 router.get('/:encoded_id', (req, res) => {
   let base58Id = req.params.encoded_id
 
+  // Fetch the long url by the encoded key
   redisClient.get(base58Id, (err, reply) => {
     if (err) {
       res.status(500).send('Error: unable to fetch the requested URL')
@@ -68,7 +70,7 @@ router.get('/:encoded_id', (req, res) => {
     }
 
     if (reply) {
-      // There is match with the short url in our URL collection
+      // There is match with the short url
       res.redirect(reply)
     } else {
       // Not found, redirect to the homepage
