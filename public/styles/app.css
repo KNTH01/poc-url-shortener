@@ -29,3 +29,8 @@ body {
 .ErrorMsg {
   color: #AA3939;
 }
+
+.SignName {
+  float: right;
+  font-size: 1.2rem;
+}
