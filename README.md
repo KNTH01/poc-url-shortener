@@ -18,7 +18,7 @@ Then, fetch the project:
 
 Basically, the app receive an URL in the input, send it to the server. The process will look for that URL in order to check if this URL has already been registered or not. If it is registered, the server return the short URL directly to the client. Otherwise, it will store the new URL in the database, then shorten the input URL by encoding the URL id in Base58. Finally, this encoded value is store in Redis as the key and the long URL as the value.
 
-When the user wants to access to a short URL, the application gets the encoded value of the short URl and access to the long URL via Redis. This allows high performances when requesting an URL.
+When the user wants to access to a short URL, the application gets the encoded value of the short URl and access to the long URL via Redis. This allows high performances when requesting an URL. Then the server redirects the client to the requested URL.
 
 ### TO DO
 
