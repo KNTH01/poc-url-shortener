@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Simple URL Shortener</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+    <!-- Milligram CSS minified -->
+    <link rel="stylesheet" href="styles/milligram.min.css">
+    <link href="styles/app.css" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="Page">
+        <h1>URL Shortener</h1>
+        <div class="row">
+          <div class="column FormInput">
+            <input class="FormInput-input" type="text" placeholder="Paste a link...">
+            <button class="FormInput-button button" type="button">Shorten</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <div class="Result"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="column">
+            <a class="SignName" href="http://zenylium.ninja/">Zenylium</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="scripts/app.js"></script>
+  </body>
+</html>
