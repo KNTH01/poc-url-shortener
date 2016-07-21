@@ -3,7 +3,7 @@
 const express = require('express')
 const router = express.Router()
 const config = require('./config')
-const Base58 = require('./lib/Base58')
+const Base58 = require('./services/Base58')
 const Url = require('./models/Url')
 
 // Shorten the url
