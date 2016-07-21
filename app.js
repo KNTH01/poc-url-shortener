@@ -35,30 +35,30 @@ app.get('/', (req, res) => {
 app.use('/', routes)
 
 // Wait for connection to our Databases (Redis and MySQL) before launching the server
-sequelize
-  .authenticate()
-  .then((err) => {
-    if (err) {
-      console.error(err)
-    }
-    console.log('Connection to MySQL has been established successfully.')
-    app.listen(config.server.port, () => {
-      console.log(`Serveur is up to address: http://${config.server.host}:${config.server.port}/`)
-    })
-  })
-  .catch((err) => {
-    if (err) {
-      console.log('Unable to connect to the database:', err)
-      throw err
-    }
-  })
 
 redisClient.on('connect', (err) => {
   if (err) {
-    console.error(err)
+    console.error('Unable to connect to the Redis server', err)
     throw err
   }
   console.log('Connection to Redis has been established successfully.')
+  sequelize
+    .authenticate()
+    .then((err) => {
+      if (err) {
+        console.error(err)
+      }
+      console.log('Connection to MySQL has been established successfully.')
+      app.listen(config.server.port, () => {
+        console.log(`Serveur is up to address: http://${config.server.host}:${config.server.port}/`)
+      })
+    })
+    .catch((err) => {
+      if (err) {
+        console.log('Unable to connect to the database:', err)
+        throw err
+      }
+    })
 })
 
 // const Url = sequelize.define('url', {
