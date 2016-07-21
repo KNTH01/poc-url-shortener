@@ -1,24 +1,31 @@
 {
   "name": "poc-url-shortener",
   "version": "1.0.0",
-  "description": "A PoC of a URL shortener with ExpressJS and Redis",
+  "description": "A PoC of a URL shortener with ExpressJS, MySQL and Redis",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
+    "nodejs",
     "express",
+    "mysql",
     "redis",
     "url",
-    "shortener"
+    "shortener",
+    "standardjs"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KevinNTH/poc-url-shortener"
+  },
   "author": "Kevin Nguyen",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "milligram": "^1.1.0",
-    "mongoose": "^4.5.1",
     "mysql": "^2.11.1",
     "redis": "^2.6.2",
     "sequelize": "^3.23.5"
