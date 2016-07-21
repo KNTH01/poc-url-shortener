@@ -4,66 +4,67 @@ const express = require('express')
 const router = express.Router()
 const config = require('./config')
 const Base58 = require('./lib/Base58')
+const Url = require('./models/Url')
 
 // Shorten the url
 router.post('/api/shorten', (req, res) => {
-  const COUNT_URL = 'countUrl'
   let longUrl = req.body.url
   let shortUrl = ''
 
-  // Fetch the long url
-  redisClient.get(longUrl, (err, reply) => {
-    if (err) {
-      res.status(500).send('Error: unable to request the submitted URL')
-      return
+  // Find a longUrl
+  Url.findOne({
+    where: {
+      longUrl
     }
-    // If the url is already submitted
-    if (reply) {
-      // Shorten the Url with the url id and send it back to the client
-      shortUrl = config.webhost + Base58.encode(reply)
-      res.send({
+  }).then(url => {
+    if (url) {
+      // The url has already been registered
+      shortUrl = config.webhost + url.get('shortenKey')
+      return res.send({
         shortUrl
       })
     } else {
-      // Store a new url
-      // Begin by incrementing the count key and will use it as the url id
-      redisClient.incr(COUNT_URL, (err, replyCount) => {
-        if (err) {
-          res.status(500).send('Error: something wrong happens when saving a new URL id in the database')
-          return
-        }
-        // Store the new url with key => url, value => id
-        redisClient.set(longUrl, replyCount, (err) => {
-          if (err) {
-            res.status(500).send('Error: something wrong happens when saving a new URL in the database')
-            return
-          }
-
-          let encodedKey = Base58.encode(replyCount)
-          shortUrl = config.webhost + encodedKey
-
-          // store the encoded key in order to fetch the long url when requested
-          redisClient.set(encodedKey, longUrl, (err) => {
+      // Create a new URL and store the new longUrl
+      Url.create({
+        longUrl
+      }).then(newUrl => {
+        // Shorten the url with its new id and update it
+        let shortenKey = Base58.encode(newUrl.get('id'))
+        newUrl.update({
+          shortenKey
+        }).then(newUrl => {
+          // Store the shortenKey into Redis in order to instant fetch the long url when requested
+          redisClient.set(shortenKey, longUrl, (err) => {
             if (err) {
-              res.status(500).send('Error: something wrong happens when saving the new encoded key in the database')
-              return
+              return res.status(500).send('Error: something wrong happens when saving the new encoded key in the database')
             }
-
+            shortUrl = config.webhost + shortenKey
             res.send({
               shortUrl
             })
           })
+        }).error(err => {
+          console.error(err)
+          return res.status(500).send('Error')
         })
+      }).error(err => {
+        if (err) {
+          console.error(err)
+          return res.status(500).send('Error')
+        }
       })
     }
+  }).error(err => {
+    console.error(err)
+    return res.status(500).send('Error')
   })
 })
 
-router.get('/:encoded_id', (req, res) => {
-  let base58Id = req.params.encoded_id
+router.get('/:shortenKey', (req, res) => {
+  let shortenKey = req.params.shortenKey
 
   // Fetch the long url by the encoded key
-  redisClient.get(base58Id, (err, reply) => {
+  redisClient.get(shortenKey, (err, reply) => {
     if (err) {
       res.status(500).send('Error: unable to fetch the requested URL')
       return

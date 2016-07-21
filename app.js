@@ -14,6 +14,7 @@ const redisClient = redis.createClient()
 
 // Store this as global in order to use it in routes.js
 global.redisClient = redisClient
+global.sequelize = sequelize
 
 const routes = require('./routes')
 const app = express()
@@ -35,7 +36,6 @@ app.get('/', (req, res) => {
 app.use('/', routes)
 
 // Wait for connection to our Databases (Redis and MySQL) before launching the server
-
 redisClient.on('connect', (err) => {
   if (err) {
     console.error('Unable to connect to the Redis server', err)
@@ -50,39 +50,13 @@ redisClient.on('connect', (err) => {
       }
       console.log('Connection to MySQL has been established successfully.')
       app.listen(config.server.port, () => {
-        console.log(`Serveur is up to address: http://${config.server.host}:${config.server.port}/`)
+        console.log(`Server is up to address: http://${config.server.host}:${config.server.port}/`)
       })
     })
-    .catch((err) => {
+    .error((err) => {
       if (err) {
-        console.log('Unable to connect to the database:', err)
+        console.error('Unable to connect to the database:', err)
         throw err
       }
     })
 })
-
-// const Url = sequelize.define('url', {
-//   id: {
-//     type: Sequelize.INTEGER,
-//     primaryKey: true,
-//     autoIncrement: true
-//   },
-//   longUrl: {
-//     type: Sequelize.STRING,
-//     field: 'long_url'
-//   },
-//   shortUrl: {
-//     type: Sequelize.STRING,
-//     field: 'short_url'
-//   }
-// })
-//
-// Url.sync({
-//   // force: true
-// }).then(() => {
-//   // Table created
-//   return Url.create({
-//     longUrl: 'Ok',
-//     shortUrl: 'K'
-//   })
-// })
