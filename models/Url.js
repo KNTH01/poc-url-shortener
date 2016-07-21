@@ -23,6 +23,11 @@ const Url = sequelize.define('url', {
     type: Sequelize.STRING,
     field: 'shorten_key'
   }
-}).sync()
+})
+
+// create the  urls table according to the model
+Url.sync().then(() => {
+  console.log('Url model synced')
+})
 
 module.exports = Url
