@@ -1,7 +1,5 @@
 /**
  * Show error message
- * @param  {[type]} msg [description]
- * @return {[type]}     [description]
  */
 function showMessage (msg) {
   let resultHTML = `<p class="ErrorMsg">${msg}</p>`
@@ -11,8 +9,6 @@ function showMessage (msg) {
 
 /**
  * Show the generated short url
- * @param  {[type]} shortUrl [description]
- * @return {[type]}          [description]
  */
 function showShortenUrl (shortUrl) {
   let resultHTML = '<a class="result" href="' + shortUrl + '">' + shortUrl + '</a>'
@@ -22,7 +18,6 @@ function showShortenUrl (shortUrl) {
 
 /**
  * Clear the user input after submission
- * @return {[type]} [description]
  */
 function clearInput () {
   $('.FormInput-input').val('')
@@ -30,7 +25,6 @@ function clearInput () {
 
 /**
  * AJAX request
- * @return {[type]} [description]
  */
 function shortenUrlRequest () {
   let userUrlInput = $.trim($('.FormInput-input').val())

@@ -4,8 +4,6 @@ class Base58 {
 
   /**
    * utility function to convert base 10 integer to base 58 string
-   * @param  {[type]} num [description]
-   * @return {[type]}     [description]
    */
   static encode (num) {
     let encoded = ''
@@ -19,8 +17,6 @@ class Base58 {
 
   /**
    * utility function to convert a base 58 string to base 10 integer
-   * @param  {[type]} str [description]
-   * @return {[type]}     [description]
    */
   static decode (str) {
     let decoded = 0
